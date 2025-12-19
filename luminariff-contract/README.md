@@ -94,6 +94,46 @@ stellar contract optimize --wasm target\wasm32-unknown-unknown\release\luminarif
 
 ## Despliegue en Testnet
 
+### 🚀 Contrato Ya Desplegado en Futurenet
+
+**El contrato ya está desplegado automáticamente en Futurenet** gracias al sistema de CI/CD con GitHub Actions.
+
+#### 📋 Información del Contrato Desplegado
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Contract ID** | `CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA` |
+| **Red** | Futurenet (Test SDF Future Network) |
+| **Admin Address** | `GAO5SMPKFJ2ST6Z43PTHJ6R6ZDQDU3JWPVPIXS6CGV3T5E4YOQ7EAOKY` |
+| **Fecha de Despliegue** | 19 de diciembre de 2025 |
+| **Versión** | v0.1.3 |
+
+#### 🧪 Probar el Contrato Desplegado
+
+```powershell
+# 1. Configurar Futurenet
+stellar network add futurenet `
+  --rpc-url https://rpc-futurenet.stellar.org `
+  --network-passphrase "Test SDF Future Network ; October 2022"
+
+# 2. Crear identidad de prueba
+stellar keys generate testuser --network futurenet
+stellar keys fund testuser --network futurenet
+
+# 3. Verificar contrato
+stellar contract info --id CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA --network futurenet
+
+# 4. Ver IDs de Roblox (inicialmente vacío)
+stellar contract invoke `
+  --id CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA `
+  --network futurenet `
+  -- get_roblox_ids
+```
+
+### 🔧 Despliegue Manual (Opcional)
+
+Si deseas desplegar tu propia instancia del contrato, sigue estos pasos:
+
 ### 1. Configurar Red de Pruebas
 
 ```powershell

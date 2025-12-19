@@ -15,6 +15,67 @@ Write-Host "   LuminaRiff - Deploy to Futurenet" -ForegroundColor Cyan
 Write-Host "============================================" -ForegroundColor Cyan
 Write-Host ""
 
+# ============================================
+# CONTRATO YA DESPLEGADO AUTOMÁTICAMENTE
+# ============================================
+$DEPLOYED_CONTRACT_ID = "CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA"
+$DEPLOYED_ADMIN_ADDRESS = "GAO5SMPKFJ2ST6Z43PTHJ6R6ZDQDU3JWPVPIXS6CGV3T5E4YOQ7EAOKY"
+$DEPLOYED_NETWORK = "futurenet"
+
+Write-Host "CONTRATO YA DESPLEGADO EN FUTURNET:" -ForegroundColor Green
+Write-Host "-----------------------------------" -ForegroundColor Gray
+Write-Host "Contract ID:  $DEPLOYED_CONTRACT_ID" -ForegroundColor Yellow
+Write-Host "Admin:        $DEPLOYED_ADMIN_ADDRESS" -ForegroundColor Yellow
+Write-Host "Network:      $DEPLOYED_NETWORK" -ForegroundColor Yellow
+Write-Host "Fecha:        19 de diciembre de 2025" -ForegroundColor Yellow
+Write-Host ""
+
+$useDeployed = Read-Host "¿Quieres usar el contrato ya desplegado? (y/n)"
+
+if ($useDeployed -eq "y" -or $useDeployed -eq "Y") {
+    Write-Host "`nUsando contrato desplegado automáticamente..." -ForegroundColor Green
+
+    # ============================================
+    # PRUEBAS CON EL CONTRATO DESPLEGADO
+    # ============================================
+    Write-Host "`n[1/3] Verificando contrato desplegado..." -ForegroundColor Yellow
+
+    try {
+        $result = stellar contract info --id $DEPLOYED_CONTRACT_ID --network $DEPLOYED_NETWORK 2>&1
+        Write-Host "OK: Contrato encontrado en la red" -ForegroundColor Green
+    } catch {
+        Write-Host "ERROR: No se pudo verificar el contrato" -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host "`n[2/3] Próximos pasos con el contrato desplegado:" -ForegroundColor Yellow
+    Write-Host "--------------------------------------------" -ForegroundColor Gray
+
+    Write-Host "`nPaso 1: Inicializar el contrato" -ForegroundColor Cyan
+    Write-Host "stellar contract invoke --id $DEPLOYED_CONTRACT_ID --source admin --network $DEPLOYED_NETWORK -- initialize --admin $DEPLOYED_ADMIN_ADDRESS --token_address USDC_TOKEN_ADDRESS" -ForegroundColor White
+
+    Write-Host "`nPaso 2: Comprar un ticket de prueba" -ForegroundColor Cyan
+    Write-Host "stellar contract invoke --id $DEPLOYED_CONTRACT_ID --source admin --network $DEPLOYED_NETWORK -- buy_ticket --buyer $DEPLOYED_ADMIN_ADDRESS --roblox_user_id TestUser123" -ForegroundColor White
+
+    Write-Host "`nPaso 3: Ver participantes" -ForegroundColor Cyan
+    Write-Host "stellar contract invoke --id $DEPLOYED_CONTRACT_ID --network $DEPLOYED_NETWORK -- get_roblox_ids" -ForegroundColor White
+
+    Write-Host "`nPaso 4: Ejecutar sorteo (solo admin)" -ForegroundColor Cyan
+    Write-Host "stellar contract invoke --id $DEPLOYED_CONTRACT_ID --source admin --network $DEPLOYED_NETWORK -- execute_draw --admin $DEPLOYED_ADMIN_ADDRESS" -ForegroundColor White
+
+    Write-Host ""
+    Write-Host "============================================" -ForegroundColor Green
+    Write-Host "  CONTRATO LISTO PARA USAR" -ForegroundColor Green
+    Write-Host "============================================" -ForegroundColor Green
+    Write-Host ""
+
+    exit 0
+}
+
+Write-Host "`nProcediendo con despliegue manual..." -ForegroundColor Yellow
+Write-Host ""
+
 $NETWORK = "futurenet"
 $WASM_PATH = "target\wasm32-unknown-unknown\release\luminariff_contract.wasm"
 

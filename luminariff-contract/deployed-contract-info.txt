@@ -1,0 +1,38 @@
+# ============================================
+# Información del Contrato Desplegado
+# LuminaRiff - Stellar Futurenet
+# ============================================
+
+# Contrato desplegado automáticamente via GitHub Actions
+CONTRACT_ID="CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA"
+ADMIN_ADDRESS="GAO5SMPKFJ2ST6Z43PTHJ6R6ZDQDU3JWPVPIXS6CGV3T5E4YOQ7EAOKY"
+NETWORK="futurenet"
+DEPLOYMENT_DATE="2025-12-19"
+VERSION="v0.1.3"
+
+# URLs de red
+RPC_URL="https://rpc-futurenet.stellar.org"
+NETWORK_PASSPHRASE="Test SDF Future Network ; October 2022"
+
+# Workflow de GitHub
+GITHUB_REPO="emolinah/luminariff"
+WORKFLOW_RUN_URL="https://github.com/emolinah/luminariff/actions/runs/20384041068"
+
+# ============================================
+# Comandos de Uso Rápido
+# ============================================
+
+# Verificar contrato
+# stellar contract info --id $CONTRACT_ID --network $NETWORK
+
+# Ver participantes
+# stellar contract invoke --id $CONTRACT_ID --network $NETWORK -- get_roblox_ids
+
+# Inicializar contrato (requiere admin)
+# stellar contract invoke --id $CONTRACT_ID --source admin --network $NETWORK -- initialize --admin $ADMIN_ADDRESS --token_address USDC_TOKEN_ADDRESS
+
+# Comprar ticket
+# stellar contract invoke --id $CONTRACT_ID --source user --network $NETWORK -- buy_ticket --buyer USER_ADDRESS --roblox_user_id ROBLOX_ID
+
+# Ejecutar sorteo (solo admin)
+# stellar contract invoke --id $CONTRACT_ID --source admin --network $NETWORK -- execute_draw --admin $ADMIN_ADDRESS

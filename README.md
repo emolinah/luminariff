@@ -156,6 +156,7 @@ cd luminariff-contract
 - [x] Tests unitarios
 - [x] Documentación completa
 - [x] Scripts de demostración
+- [x] **Despliegue automático en Futurenet** ✅
 - [ ] Frontend React/Next.js
 - [ ] Integración con Roblox API
 - [ ] Sistema de múltiples rifas simultáneas

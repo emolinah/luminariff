@@ -4,6 +4,37 @@ Esta guía te muestra cómo desplegar tu smart contract LuminaRiff a Stellar Fut
 
 ---
 
+## ✅ DEPLOYMENT COMPLETADO EXITOSAMENTE
+
+**El contrato LuminaRiff ya está desplegado en Futurenet** mediante el sistema automático de GitHub Actions.
+
+### 📋 Información del Contrato Desplegado
+
+| Propiedad | Valor |
+|-----------|-------|
+| **Estado** | ✅ Desplegado |
+| **Contract ID** | `CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA` |
+| **Red** | Futurenet |
+| **Admin Address** | `GAO5SMPKFJ2ST6Z43PTHJ6R6ZDQDU3JWPVPIXS6CGV3T5E4YOQ7EAOKY` |
+| **Fecha** | 19 de diciembre de 2025 |
+| **Versión** | v0.1.3 |
+| **Workflow Run** | [Ver en GitHub](https://github.com/emolinah/luminariff/actions/runs/20384041068) |
+
+### 🧪 Probar el Contrato
+
+```powershell
+# Configurar Futurenet
+stellar network add futurenet --rpc-url https://rpc-futurenet.stellar.org --network-passphrase "Test SDF Future Network ; October 2022"
+
+# Verificar contrato
+stellar contract info --id CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA --network futurenet
+
+# Ver participantes actuales
+stellar contract invoke --id CBWZ2Z644ZWULJ2WNYF37AIXJLIHRPYU4OTYVQP6WLZBXFB56GD3P5OA --network futurenet -- get_roblox_ids
+```
+
+---
+
 ## 📋 Requisitos Previos
 
 1. ✅ Código subido a GitHub
