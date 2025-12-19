@@ -46,24 +46,45 @@
 
 ## 🚀 Inicio Rápido
 
-### Prerrequisitos
+### Paso 1: Verificar Herramientas
 
-- **Rust** 1.75+
-- **Stellar CLI**
-- **Windows 10/11** (o WSL2)
-
-### Instalación
+Ejecuta el script de verificación:
 
 ```powershell
-# Clonar el repositorio
-git clone https://github.com/tu-usuario/luminariff.git
-cd luminariff
+.\check-install.ps1
+```
 
-# Navegar al contrato
+Si ves ❌ (falta alguna herramienta), ve al **Paso 2**.
+Si ves ✅ (todo instalado), salta al **Paso 3**.
+
+### Paso 2: Instalar Herramientas (si es necesario)
+
+**Instalación Rápida con Winget:**
+
+```powershell
+# Instalar Rust
+winget install Rustlang.Rustup
+
+# Cerrar y reabrir PowerShell, luego:
+winget install Stellar.StellarCLI
+
+# Agregar target WASM
+rustup target add wasm32-unknown-unknown
+```
+
+📖 **[Ver guía completa de instalación](INSTALL.md)** para otras opciones
+
+### Paso 3: Compilar el Contrato
+
+```powershell
 cd luminariff-contract
-
-# Compilar
 stellar contract build
+```
+
+**Salida esperada:**
+```
+✅ Compiling luminariff-contract v0.1.0
+✅ Finished release [optimized] target(s)
 ```
 
 ### Documentación Completa
