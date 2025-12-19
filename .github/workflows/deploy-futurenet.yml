@@ -1,7 +1,12 @@
 name: Deploy to Futurenet
 
 on:
-  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+  push:
+    tags:
+      - 'v*.*.*'  # Se ejecuta automáticamente al crear tags de versión (ej: v1.0.0)
+    paths:
+      - 'luminariff-contract/**'  # Solo cuando hay cambios en el contrato
+  workflow_dispatch:  # También permite ejecución manual
     inputs:
       network:
         description: 'Red de Stellar (futurenet o testnet)'
@@ -19,6 +24,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      # Determinar la red a usar
+      - name: Set network for automatic deployment
+        if: github.event_name == 'push'
+        run: |
+          echo "NETWORK=futurenet" >> $GITHUB_ENV
+          echo "Selected network: futurenet (automatic deployment)"
+
+      - name: Set network for manual deployment
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "NETWORK=${{ github.event.inputs.network }}" >> $GITHUB_ENV
+          echo "Selected network: ${{ github.event.inputs.network }} (manual deployment)"
 
       - name: Setup Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -45,23 +63,23 @@ jobs:
 
       - name: Setup Stellar network
         run: |
-          if [ "${{ github.event.inputs.network }}" = "futurenet" ]; then
+          if [ "$NETWORK" = "futurenet" ]; then
             NETWORK_PASSPHRASE="Test SDF Future Network ; October 2022"
           else
             NETWORK_PASSPHRASE="Test SDF Network ; September 2015"
           fi
-          stellar network add ${{ github.event.inputs.network }} \
-            --rpc-url https://rpc-${{ github.event.inputs.network }}.stellar.org \
+          stellar network add $NETWORK \
+            --rpc-url https://rpc-$NETWORK.stellar.org \
             --network-passphrase "$NETWORK_PASSPHRASE"
 
       - name: Generate deployment identity
         run: |
-          stellar keys generate deploy-bot --network ${{ github.event.inputs.network }}
+          stellar keys generate deploy-bot --network $NETWORK
           echo "DEPLOY_ADDRESS=$(stellar keys address deploy-bot)" >> $GITHUB_ENV
 
       - name: Fund account
         run: |
-          stellar keys fund deploy-bot --network ${{ github.event.inputs.network }}
+          stellar keys fund deploy-bot --network $NETWORK
           sleep 5
 
       - name: Deploy contract
@@ -71,7 +89,7 @@ jobs:
           CONTRACT_ID=$(stellar contract deploy \
             --wasm target/wasm32-unknown-unknown/release/luminariff_contract.wasm \
             --source deploy-bot \
-            --network ${{ github.event.inputs.network }})
+            --network $NETWORK)
           echo "CONTRACT_ID=$CONTRACT_ID" >> $GITHUB_ENV
           echo "contract_id=$CONTRACT_ID" >> $GITHUB_OUTPUT
           echo "✅ Contract deployed: $CONTRACT_ID"
@@ -83,7 +101,7 @@ jobs:
           ========================================
           LuminaRiff Deployment Info
           ========================================
-          Network: ${{ github.event.inputs.network }}
+          Network: $NETWORK
           Contract ID: ${{ env.CONTRACT_ID }}
           Deploy Address: ${{ env.DEPLOY_ADDRESS }}
           Deployed At: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
@@ -95,7 +113,7 @@ jobs:
       - name: Upload deployment artifact
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-info-${{ github.event.inputs.network }}
+          name: deployment-info-$NETWORK
           path: deployment/info.txt
           retention-days: 90
 
@@ -104,7 +122,7 @@ jobs:
           echo "## 🎉 Deployment Successful" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Contract Information" >> $GITHUB_STEP_SUMMARY
-          echo "- **Network:** ${{ github.event.inputs.network }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Network:** $NETWORK" >> $GITHUB_STEP_SUMMARY
           echo "- **Contract ID:** \`${{ env.CONTRACT_ID }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Deploy Address:** \`${{ env.DEPLOY_ADDRESS }}\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -115,7 +133,7 @@ jobs:
           echo "stellar contract invoke \\" >> $GITHUB_STEP_SUMMARY
           echo "  --id ${{ env.CONTRACT_ID }} \\" >> $GITHUB_STEP_SUMMARY
           echo "  --source admin \\" >> $GITHUB_STEP_SUMMARY
-          echo "  --network ${{ github.event.inputs.network }} \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --network $NETWORK \\" >> $GITHUB_STEP_SUMMARY
           echo "  -- initialize \\" >> $GITHUB_STEP_SUMMARY
           echo "  --admin YOUR_ADMIN_ADDRESS \\" >> $GITHUB_STEP_SUMMARY
           echo "  --token_address USDC_TOKEN_ADDRESS" >> $GITHUB_STEP_SUMMARY
