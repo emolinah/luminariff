@@ -1,0 +1,49 @@
+# Rust
+target/
+**/*.rs.bk
+*.pdb
+
+# Soroban / Stellar
+.soroban/
+*.wasm
+*.optimized.wasm
+
+# Cargo
+Cargo.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Stellar CLI keys (IMPORTANTE: no subir keys privadas)
+.stellar/
+
+# Node modules (si agregas frontend)
+node_modules/
+dist/
+build/
+
+# Temporary files
+*.tmp
+*.temp
+~$*

@@ -1,0 +1,31 @@
+[package]
+name = "luminariff-contract"
+version = "0.1.0"
+edition = "2021"
+authors = ["LuminaRiff Team"]
+description = "Smart Contract de rifas para ganar skins de Roblox usando Stellar Soroban"
+repository = "https://github.com/tu-usuario/luminariff"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+soroban-sdk = "22.0.0"
+
+[dev-dependencies]
+soroban-sdk = { version = "22.0.0", features = ["testutils"] }
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true
