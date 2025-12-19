@@ -80,7 +80,7 @@ jobs:
       - name: Fund account
         run: |
           stellar keys fund deploy-bot --network $NETWORK
-          sleep 5
+          sleep 20
 
       - name: Deploy contract
         id: deploy
