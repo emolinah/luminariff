@@ -45,9 +45,14 @@ jobs:
 
       - name: Setup Stellar network
         run: |
+          if [ "${{ github.event.inputs.network }}" = "futurenet" ]; then
+            NETWORK_PASSPHRASE="Test SDF Future Network ; October 2022"
+          else
+            NETWORK_PASSPHRASE="Test SDF Network ; September 2015"
+          fi
           stellar network add ${{ github.event.inputs.network }} \
             --rpc-url https://rpc-${{ github.event.inputs.network }}.stellar.org \
-            --network-passphrase "Test SDF Future Network ; October 2022"
+            --network-passphrase "$NETWORK_PASSPHRASE"
 
       - name: Generate deployment identity
         run: |
