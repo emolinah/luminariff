@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell.exe -Command \"& ''C:\\\\Users\\\\exequiel molina\\\\.cargo\\\\bin\\\\rustup.exe'' target list --installed\")",
+      "Bash(whereis:*)"
+    ]
+  }
+}

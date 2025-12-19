@@ -1,0 +1,112 @@
+name: Deploy to Futurenet
+
+on:
+  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+    inputs:
+      network:
+        description: 'Red de Stellar (futurenet o testnet)'
+        required: true
+        default: 'futurenet'
+        type: choice
+        options:
+          - futurenet
+          - testnet
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Add WASM target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install Stellar CLI
+        run: |
+          cargo install --locked stellar-cli
+
+      - name: Build contract
+        run: |
+          cd luminariff-contract
+          cargo build --release --target wasm32-unknown-unknown
+
+      - name: Setup Stellar network
+        run: |
+          stellar network add ${{ github.event.inputs.network }} \
+            --rpc-url https://rpc-${{ github.event.inputs.network }}.stellar.org \
+            --network-passphrase "Test SDF Future Network ; October 2022"
+
+      - name: Generate deployment identity
+        run: |
+          stellar keys generate deploy-bot --network ${{ github.event.inputs.network }}
+          echo "DEPLOY_ADDRESS=$(stellar keys address deploy-bot)" >> $GITHUB_ENV
+
+      - name: Fund account
+        run: |
+          stellar keys fund deploy-bot --network ${{ github.event.inputs.network }}
+          sleep 5
+
+      - name: Deploy contract
+        id: deploy
+        run: |
+          cd luminariff-contract
+          CONTRACT_ID=$(stellar contract deploy \
+            --wasm target/wasm32-unknown-unknown/release/luminariff_contract.wasm \
+            --source deploy-bot \
+            --network ${{ github.event.inputs.network }})
+          echo "CONTRACT_ID=$CONTRACT_ID" >> $GITHUB_ENV
+          echo "contract_id=$CONTRACT_ID" >> $GITHUB_OUTPUT
+          echo "✅ Contract deployed: $CONTRACT_ID"
+
+      - name: Save deployment info
+        run: |
+          mkdir -p deployment
+          cat > deployment/info.txt << EOF
+          ========================================
+          LuminaRiff Deployment Info
+          ========================================
+          Network: ${{ github.event.inputs.network }}
+          Contract ID: ${{ env.CONTRACT_ID }}
+          Deploy Address: ${{ env.DEPLOY_ADDRESS }}
+          Deployed At: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          Commit: ${{ github.sha }}
+          ========================================
+          EOF
+          cat deployment/info.txt
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: deployment-info-${{ github.event.inputs.network }}
+          path: deployment/info.txt
+          retention-days: 90
+
+      - name: Create deployment summary
+        run: |
+          echo "## 🎉 Deployment Successful" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Contract Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Network:** ${{ github.event.inputs.network }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Contract ID:** \`${{ env.CONTRACT_ID }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy Address:** \`${{ env.DEPLOY_ADDRESS }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Initialize the contract:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
+          echo "stellar contract invoke \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --id ${{ env.CONTRACT_ID }} \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --source admin \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --network ${{ github.event.inputs.network }} \\" >> $GITHUB_STEP_SUMMARY
+          echo "  -- initialize \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --admin YOUR_ADMIN_ADDRESS \\" >> $GITHUB_STEP_SUMMARY
+          echo "  --token_address USDC_TOKEN_ADDRESS" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
