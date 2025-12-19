@@ -6,8 +6,6 @@ use soroban_sdk::{
 
 // Constantes del contrato
 const TICKET_PRICE: i128 = 1_0000000; // 1 USDC (7 decimales)
-const ADMIN_KEY: &str = "ADMIN";
-const PARTICIPANTS_KEY: &str = "PARTICIPANTS";
 
 /// Estructura para almacenar información de cada participante
 #[contracttype]
