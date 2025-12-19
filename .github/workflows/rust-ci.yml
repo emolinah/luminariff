@@ -1,0 +1,105 @@
+# ============================================
+# GitHub Actions - CI para LuminaRiff
+# ============================================
+# Este workflow se ejecuta automáticamente en cada push y pull request
+# para verificar que el código compila y pasa los tests
+
+name: Rust CI
+
+# Eventos que activan este workflow
+on:
+  push:
+    branches: [ main ]  # Se ejecuta en pushes a main
+  pull_request:
+    branches: [ main ]  # Se ejecuta en PRs hacia main
+
+# Variables de entorno globales
+env:
+  CARGO_TERM_COLOR: always
+
+# Jobs (tareas) a ejecutar
+jobs:
+  # Job 1: Build y Test
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest  # Sistema operativo del runner
+
+    steps:
+      # Paso 1: Checkout del código
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      # Paso 2: Instalar Rust
+      - name: 🦀 Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      # Paso 3: Agregar target WASM
+      - name: 🎯 Add WASM target
+        run: rustup target add wasm32-unknown-unknown
+
+      # Paso 4: Cache de dependencias (acelera builds)
+      - name: 💾 Cache cargo dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            luminariff-contract/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('luminariff-contract/Cargo.lock') }}
+
+      # Paso 5: Verificar formato del código
+      - name: 📝 Check code formatting
+        run: cd luminariff-contract && cargo fmt --all -- --check
+
+      # Paso 6: Linter (Clippy)
+      - name: 🔍 Run Clippy linter
+        run: cd luminariff-contract && cargo clippy --all-targets --all-features -- -D warnings
+
+      # Paso 7: Compilar el proyecto
+      - name: 🏗️ Build project
+        run: cd luminariff-contract && cargo build --release --target wasm32-unknown-unknown
+
+      # Paso 8: Ejecutar tests
+      - name: 🧪 Run tests
+        run: cd luminariff-contract && cargo test --verbose
+
+      # Paso 9: Verificar que el WASM se generó
+      - name: ✅ Verify WASM output
+        run: |
+          if [ -f "luminariff-contract/target/wasm32-unknown-unknown/release/luminariff_contract.wasm" ]; then
+            echo "✅ WASM file generated successfully"
+            ls -lh luminariff-contract/target/wasm32-unknown-unknown/release/luminariff_contract.wasm
+          else
+            echo "❌ WASM file not found"
+            exit 1
+          fi
+
+      # Paso 10: Subir WASM como artefacto (para descargar después)
+      - name: 📦 Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: luminariff-contract-wasm
+          path: luminariff-contract/target/wasm32-unknown-unknown/release/luminariff_contract.wasm
+          retention-days: 7
+
+  # Job 2: Security Audit (opcional)
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🦀 Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: 🔒 Run cargo audit
+        run: |
+          cargo install cargo-audit
+          cd luminariff-contract && cargo audit
