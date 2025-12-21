@@ -42,15 +42,16 @@ jobs:
 
       # Paso 4: Cache de dependencias (acelera builds)
       - name: 💾 Cache cargo dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/bin/
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             luminariff-contract/target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('luminariff-contract/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
 
       # Paso 5: Verificar formato del código
       - name: 📝 Check code formatting
@@ -101,5 +102,10 @@ jobs:
 
       - name: 🔒 Run cargo audit
         run: |
-          cargo install cargo-audit
+          if ! command -v cargo-audit &> /dev/null; then
+            echo "Installing cargo-audit..."
+            cargo install cargo-audit
+          else
+            echo "cargo-audit already installed"
+          fi
           cd luminariff-contract && cargo audit
