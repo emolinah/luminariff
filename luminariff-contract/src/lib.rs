@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, token, Address, Env, String, Vec, symbol_short,
+    contract, contractimpl, contracttype, symbol_short, token, Address, Env, String, Vec,
 };
 
 // Constantes del contrato
@@ -45,11 +45,15 @@ impl LuminariffContract {
         env.storage().instance().set(&DataKey::Admin, &admin);
 
         // Guardar la dirección del token USDC
-        env.storage().instance().set(&DataKey::TokenAddress, &token_address);
+        env.storage()
+            .instance()
+            .set(&DataKey::TokenAddress, &token_address);
 
         // Inicializar la lista de participantes vacía
         let participants: Vec<Participant> = Vec::new(&env);
-        env.storage().instance().set(&DataKey::Participants, &participants);
+        env.storage()
+            .instance()
+            .set(&DataKey::Participants, &participants);
     }
 
     /// Permite a un usuario comprar un ticket enviando 1 USDC al contrato
@@ -100,13 +104,13 @@ impl LuminariffContract {
         participants.push_back(participant);
 
         // Guardar lista actualizada
-        env.storage().instance().set(&DataKey::Participants, &participants);
+        env.storage()
+            .instance()
+            .set(&DataKey::Participants, &participants);
 
         // Emitir evento de compra de ticket
-        env.events().publish(
-            (symbol_short!("ticket"), buyer),
-            roblox_user_id,
-        );
+        env.events()
+            .publish((symbol_short!("ticket"), buyer), roblox_user_id);
     }
 
     /// Devuelve la lista completa de participantes (solo lectura)
@@ -195,14 +199,14 @@ impl LuminariffContract {
             .expect("Failed to get winner");
 
         // Emitir evento con el ganador
-        env.events().publish(
-            (symbol_short!("winner"),),
-            winner.clone(),
-        );
+        env.events()
+            .publish((symbol_short!("winner"),), winner.clone());
 
         // Limpiar la lista de participantes para la próxima rifa
         let empty_participants: Vec<Participant> = Vec::new(&env);
-        env.storage().instance().set(&DataKey::Participants, &empty_participants);
+        env.storage()
+            .instance()
+            .set(&DataKey::Participants, &empty_participants);
 
         winner
     }
@@ -255,10 +259,8 @@ impl LuminariffContract {
         token_client.transfer(&contract_address, &admin, &amount);
 
         // Emitir evento de retiro
-        env.events().publish(
-            (symbol_short!("withdraw"), admin),
-            amount,
-        );
+        env.events()
+            .publish((symbol_short!("withdraw"), admin), amount);
     }
 
     /// Obtiene la dirección del administrador
