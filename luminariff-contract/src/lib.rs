@@ -280,7 +280,7 @@ mod test {
     #[test]
     fn test_initialize() {
         let env = Env::default();
-        let contract_id = env.register_contract(None, LuminariffContract);
+        let contract_id = env.register(LuminariffContract, ());
         let client = LuminariffContractClient::new(&env, &contract_id);
 
         let admin = Address::generate(&env);
@@ -294,7 +294,7 @@ mod test {
     #[test]
     fn test_get_players_empty() {
         let env = Env::default();
-        let contract_id = env.register_contract(None, LuminariffContract);
+        let contract_id = env.register(LuminariffContract, ());
         let client = LuminariffContractClient::new(&env, &contract_id);
 
         let admin = Address::generate(&env);
