@@ -304,6 +304,72 @@ stellar contract invoke `
 Write-Host "`n=== Demo Completada ===" -ForegroundColor Green
 ```
 
+## Scripts de Prueba
+
+El proyecto incluye scripts de PowerShell para probar exhaustivamente todas las funcionalidades del contrato desplegado en Futurenet:
+
+### 🧪 test-contract-functions.ps1
+Script básico para probar las funciones principales del contrato:
+- Verificación de información del contrato desplegado
+- Consulta de dirección del administrador
+- Verificación de estado de inicialización
+- Consulta de participantes e IDs de Roblox
+- Verificación de conteo de participantes
+
+```powershell
+# Ejecutar pruebas básicas
+.\test-contract-functions.ps1
+```
+
+### 🎯 test-full-raffle-flow.ps1
+Script completo para simular un flujo de rifa end-to-end:
+- Configuración de múltiples usuarios de prueba
+- Financiamiento de cuentas con XLM y USDC
+- Compra de tickets por múltiples participantes
+- Verificación de balances y participantes
+- Ejecución del sorteo por el administrador
+- Validación del ganador y limpieza de la lista
+
+```powershell
+# Ejecutar simulación completa de rifa
+.\test-full-raffle-flow.ps1
+```
+
+### 🔐 test-admin-functions.ps1
+Script para probar funciones administrativas y controles de seguridad:
+- Verificación de permisos de administrador
+- Pruebas de acceso no autorizado (deben fallar)
+- Ejecución de sorteos con credenciales correctas
+- Pruebas de retiro de fondos
+- Validación de controles de seguridad
+
+```powershell
+# Ejecutar pruebas de seguridad administrativa
+.\test-admin-functions.ps1
+```
+
+### 📋 Requisitos para Ejecutar Pruebas
+
+1. **Stellar CLI instalado** y configurado
+2. **Acceso a Futurenet** (configurado automáticamente por los scripts)
+3. **Fondos de prueba** (XLM y USDC) - obtenidos automáticamente por los scripts
+4. **PowerShell** con permisos de ejecución
+
+### 🔄 Flujo de Pruebas Recomendado
+
+```powershell
+# 1. Pruebas básicas (sin costos)
+.\test-contract-functions.ps1
+
+# 2. Pruebas administrativas (sin costos)
+.\test-admin-functions.ps1
+
+# 3. Simulación completa de rifa (requiere USDC)
+.\test-full-raffle-flow.ps1
+```
+
+**Nota**: Los scripts incluyen prompts interactivos para confirmar operaciones que requieren fondos reales (USDC).
+
 ## Ejecutar Tests
 
 ```powershell
