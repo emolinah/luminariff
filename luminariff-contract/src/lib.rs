@@ -79,13 +79,13 @@ impl LuminariffContract {
             .expect("Token address not set");
 
         // Crear cliente del token
-        let token_client = token::Client::new(&env, &token_address);
+        // descomentar despues let token_client = token::Client::new(&env, &token_address);
 
         // Obtener la dirección del contrato para recibir los tokens
-        let contract_address = env.current_contract_address();
+        // descomentar despues let contract_address = env.current_contract_address();
 
         // Transferir 1 USDC del comprador al contrato
-        token_client.transfer(&buyer, &contract_address, &TICKET_PRICE);
+        // descomentar despues token_client.transfer(&buyer, &contract_address, &TICKET_PRICE);
 
         // Crear estructura de participante
         let participant = Participant {
